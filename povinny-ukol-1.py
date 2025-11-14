@@ -27,19 +27,20 @@ class Locality:
         # !!! tato cast nefunguje, smazat
 
 #### Praha, Brno
-
+"""
 praha = Locality("Praha", 6.4)
 brno = Locality("Brno", 2.3)
-
+"""
 """
 praha = Locality(name="Praha", locality_coefficient=6.4)
 brno = Locality(name="Brno", locality_coefficient=2.3)
 """
-
+"""
 print(praha)
 print(brno)
 
 print("Koeficient pro Brno: ", brno.locality_coefficient)
+"""
 
 ### 2) třída Property s atributem locality
 """
@@ -52,7 +53,7 @@ class Property:
     def __init__(self, locality: Locality):
     #def __init__(self, locality: Locality, size: float):
         self.locality = locality
-        # self.size = size --> uvest navic i m², aby to davalo vetsi smysl?
+        # self.size = size --> uvest navic i m², aby to davalo vetsi smysl? --> bude nize
     def __str__(self) -> str:
         return f"Nemovitost se nachází v lokalitě s názvem {self.locality.name}." 
 
@@ -60,7 +61,7 @@ class Property:
         #return f"Nemovitost o velikosti {self.size} m² se nachází v lokalitě {self.locality.name}"
 
 #### Dům, byt
-
+"""
 dum_v_praze = Property(locality=praha)
 byt_v_brne = Property(locality=brno)
 
@@ -68,11 +69,39 @@ print(dum_v_praze)
 print(byt_v_brne)
 
 print(f"Místní koeficient pro dům v Praze je: {dum_v_praze.locality.locality_coefficient}")
+"""
 
+### 3) třída Estate (potomek Property) s atributy locality, estate_type, area
 """
 Dále vytvoř třídu Estate, která reprezentuje pozemek a je potomkem třídy Property. 
 Třída bude mít atributy locality, estate_type (typ pozemku), area (plocha pozemku 
-v metrech čtverečních). Dále přidej metodu calculate_tax(), která spočítá výši daně 
+v metrech čtverečních). 
+"""
+
+class Estate(Property):
+    def __init__(self, locality: Locality, estate_type: str, area: float):
+        super().__init__(locality)
+        self.estate_type = estate_type
+        self.area = area
+    def __str__(self) -> str:
+        return (f"Pozemek typu {self.estate_type} o rozloze {self.area} m² "
+                f"v lokalitě s názvem {self.locality.name}.")
+    
+#### Zahrádka u Brna
+brno = Locality(name="Brno", locality_coefficient=6.66)
+
+zahradka_brno = Estate(
+    locality=brno,
+    estate_type="zahradka",
+    area=123.21
+)
+
+print(zahradka_brno)
+
+### 4) Metoda calculate_tax()
+
+"""
+Dále přidej metodu calculate_tax(), která spočítá výši daně 
 pro pozemek a vrátí hodnotu jak celé číslo (pro zaokrouhlení použij funkci ceil() 
 z modulu math). Daň vypočítej pomocí vzorce: plocha pozemku * koeficient dle typu 
 pozemku (atribut estate_type) * místní koeficient. U atributu estate_type 
