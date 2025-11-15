@@ -157,11 +157,44 @@ print("Daň estate4:", estate4.calculate_tax())
 
 ### 5) Třída Residence (potomek Property) s atributy locality, area, commercial
 """
-Vytvoř třídu Residence`, která reprezentuje byt, dům či jinou stavbu a je potomkem 
+Vytvoř třídu Residence, která reprezentuje byt, dům či jinou stavbu a je potomkem 
 třídy Property. Třída bude mít atributy locality, area (podlahová plocha bytu nebo 
 domu) a commercial (pravdivostní hodnota, která určuje, zda se jedná o nemovitost 
 používanou k podnikání). 
 """
+
+class Residence(Property):
+    def __init__(self, locality: Locality, area: float, commercial: bool):
+        super().__init__(locality)
+        self.area = area
+        self.commercial = commercial
+    def __str__(self) -> str: #str?
+        if self.commercial:
+            use = "Komerční/k podnikání"
+        else:
+            use = "Obytné"
+        return (f"Stavba s atributy:" # zjistit, jak rozdelit na radky
+                f" lokalita: {self.locality.name} (koeficient {self.locality.locality_coefficient}),"
+                f" podlahová plocha: {self.area} m²,"
+                f" využití: {use}.")
+
+#### Nemovitosti  
+locality_prague = Locality("Praha", 2.8)
+
+my_flat = Residence(
+    locality=locality_prague, 
+    area=75.5, 
+    commercial=False
+)
+
+my_office = Residence(
+    locality=locality_prague, 
+    area=670.0, 
+    commercial=True
+)
+
+print(my_flat)
+print(my_office)
 
 ### 6) Třída Residence - metoda calculate_tax()
 """

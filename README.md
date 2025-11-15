@@ -30,7 +30,7 @@ Dále vytvoř třídu **Estate**, která reprezentuje pozemek a je potomkem tř�
 
 Uvažujme tedy například lesní pozemek o ploše 500 metrů čtverečních v lokalitě s místním koeficientem 2. Potom je daň 500 * 0.35 * 2 = 350.
 
-Vytvoř třídu **Residence**`, která reprezentuje byt, dům či jinou stavbu a je potomkem třídy **Property**. Třída bude mít atributy **locality**, **area** (podlahová plocha bytu nebo domu) a **commercial** (pravdivostní hodnota, která určuje, zda se jedná o nemovitost používanou k podnikání). Dále přidej metodu **calculate_tax()**, která spočítá výši daně pro byt a vrátí hodnotu jako číslo. Daň vypočítej pomocí vzorce: podlahová plocha * koeficient lokality * 15. Pokud je hodnota parametru **commercial** True, tj. pokud jde o komerční nemovitost, vynásob celou daň číslem 2.
+Vytvoř třídu **Residence**, která reprezentuje byt, dům či jinou stavbu a je potomkem třídy **Property**. Třída bude mít atributy **locality**, **area** (podlahová plocha bytu nebo domu) a **commercial** (pravdivostní hodnota, která určuje, zda se jedná o nemovitost používanou k podnikání). Dále přidej metodu **calculate_tax()**, která spočítá výši daně pro byt a vrátí hodnotu jako číslo. Daň vypočítej pomocí vzorce: podlahová plocha * koeficient lokality * 15. Pokud je hodnota parametru **commercial** True, tj. pokud jde o komerční nemovitost, vynásob celou daň číslem 2.
 
 Příklad výpočtu: Uvažujme tedy například byt (určený k bydlení) o ploše 60 metrů čtverečních v lokalitě s koeficientem 3. Potom je daň 60 * 3 * 15 = 2700. Pokud by stejný byt byl používán k podnikání, daň by byla 60 * 3 * 15 * 2 = 5400.
 
