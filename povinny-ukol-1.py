@@ -6,6 +6,7 @@ Aplikace bude postavená na principech OOP. Tato daň se vztahuje na pozemky,
 bytové a komerční prostory. Výše daně se odvíjí od několika faktorů, např. typu 
 nemovitosti, velikosti, lokalitě, kde se nemovitost nachází atd.
 """
+# from pydantic import BaseModel, PositiveInt, field_validator --> ma smysl?
 
 ### 1) Třída Locality s atributy name a locality_coefficient
 """
@@ -26,8 +27,8 @@ class Locality:
         #return f"Lokalita: {self.name}, místní koeficient: {self.locality_coefficient}"
         # !!! tato cast nefunguje, smazat
 
-#### Praha, Brno
 """
+#### Praha, Brno
 praha = Locality("Praha", 6.4)
 brno = Locality("Brno", 2.3)
 """
@@ -60,8 +61,8 @@ class Property:
     #def __str__(self) -> str:
         #return f"Nemovitost o velikosti {self.size} m² se nachází v lokalitě {self.locality.name}"
 
-#### Dům, byt
 """
+#### Dům, byt
 dum_v_praze = Property(locality=praha)
 byt_v_brne = Property(locality=brno)
 
@@ -78,15 +79,9 @@ Třída bude mít atributy locality, estate_type (typ pozemku), area (plocha poz
 v metrech čtverečních). 
 """
 
-class Estate(Property):
-    def __init__(self, locality: Locality, estate_type: str, area: float):
-        super().__init__(locality)
-        self.estate_type = estate_type
-        self.area = area
-    def __str__(self) -> str:
-        return (f"Pozemek typu {self.estate_type} o rozloze {self.area} m² "
-                f"v lokalitě s názvem {self.locality.name}.")
+# kod nize, kde je doplnen o krok 4)
     
+"""
 #### Zahrádka u Brna
 brno = Locality(name="Brno", locality_coefficient=6.66)
 
@@ -97,13 +92,15 @@ zahradka_brno = Estate(
 )
 
 print(zahradka_brno)
+"""
 
-### 4) Metoda calculate_tax()
-
+### 4) Třída Estate - metoda calculate_tax()
 """
 Dále přidej metodu calculate_tax(), která spočítá výši daně 
 pro pozemek a vrátí hodnotu jak celé číslo (pro zaokrouhlení použij funkci ceil() 
-z modulu math). Daň vypočítej pomocí vzorce: plocha pozemku * koeficient dle typu 
+z modulu math). 
+
+Daň vypočítej pomocí vzorce: plocha pozemku * koeficient dle typu 
 pozemku (atribut estate_type) * místní koeficient. U atributu estate_type 
 následující hodnoty a koeficienty:
 
@@ -115,14 +112,60 @@ následující hodnoty a koeficienty:
 Uvažujme tedy například lesní pozemek o ploše 500 metrů čtverečních v lokalitě 
 s místním koeficientem 2. Potom je daň 500 * 0.35 * 2 = 350.
 """
+from math import ceil
 
+class Estate(Property):
+    estate_coefficients = {
+    "land": 0.85,
+    "building site": 9.0,
+    "forrest": 0.35,
+    "garden": 2.0
+    }
+    def __init__(self, locality: Locality, estate_type: str, area: float):
+        super().__init__(locality)
+        self.estate_type = estate_type
+        self.area = area
+    def calculate_tax(self) -> int:
+        return ceil(
+            self.area * # kam se pise *, kdyz nechci vse na jednom radku?
+            self.estate_coefficients[self.estate_type] *
+            self.locality.locality_coefficient
+        )
+    def __str__(self) -> str:
+        return (f"Pozemek typu {self.estate_type} o rozloze {self.area} m² "
+                f"v lokalitě s názvem {self.locality.name}.")
 
+# bez importu ceil problem, napsat jinak?
+# co kdyz se jako input zada blbost?
 
+#### Vypocty
+loc1 = Locality("Praha", 2.8)
+loc2 = Locality("Brno", 1.1)
+loc3 = Locality("Test", 3.6)
+
+estate1 = Estate(loc1, "building site", 170)
+estate2 = Estate(loc2, "garden", 210)
+estate3 = Estate(loc3, "forrest", 999)
+estate4 = Estate(loc1, "land", 100)
+
+print("Daň estate1:", estate1.calculate_tax())
+print("Daň estate2:", estate2.calculate_tax())
+print("Daň estate3:", estate3.calculate_tax())
+print("Daň estate4:", estate4.calculate_tax())
+
+# vyzkouset nesmysly, dlouhe cislo apod.
+
+### 5) Třída Residence (potomek Property) s atributy locality, area, commercial
 """
 Vytvoř třídu Residence`, která reprezentuje byt, dům či jinou stavbu a je potomkem 
 třídy Property. Třída bude mít atributy locality, area (podlahová plocha bytu nebo 
 domu) a commercial (pravdivostní hodnota, která určuje, zda se jedná o nemovitost 
-používanou k podnikání). Dále přidej metodu calculate_tax(), která spočítá výši daně 
+používanou k podnikání). 
+"""
+
+### 6) Třída Residence - metoda calculate_tax()
+"""
+Dále přidej metodu calculate_tax(), která spočítá výši daně 
 pro byt a vrátí hodnotu jako číslo. Daň vypočítej pomocí vzorce: 
 podlahová plocha * koeficient lokality * 15. Pokud je hodnota parametru 
 commercial True, tj. pokud jde o komerční nemovitost, vynásob celou daň číslem 2.
@@ -133,14 +176,25 @@ Pokud by stejný byt byl používán k podnikání, daň by byla 60 * 3 * 15 * 2
 """
 
 
-
+### 7) Zkoušky výpočtů
 """
 Vyzkoušej svůj program pomocí následujících nemovitostí:
+"""
 
+#### A) Zemědělský pozemek
+"""
 - Zemědělský pozemek o ploše 900 metrů čtverečních v lokalitě Manětín 
 s koeficientem 0.8. Daň z této nemovitosti je 900 * 0.85 * 0.8 = 612.
+"""
+
+#### B) Dům
+"""
 - Dům s podlahovou plochou 120 metrů čtverečních v lokalitě Manětín 
 s koeficientem 0.8. Daň z této nemovitosti je 120 * 0.8 * 15 = 1440.
+"""
+
+#### C) Kancelář
+"""
 - Kancelář (tj. komerční nemovitost) s podlahovou plochou 90 metrů 
 čtverečních v lokalitě Brno s koeficientem 3. Daň z této nemovitosti 
 je 90 * 3 * 15 * 2 = 8100.
@@ -150,22 +204,45 @@ je 90 * 3 * 15 * 2 = 8100.
 """
 Tyto bonusy jsou nepovinné a záleží čistě na tobě, zda se do nich pustíš. 
 Jednotlivé části jsou nezávislé, můžeš si tedy vybrat libovolné odrážky a ty vyřešit.
+"""
 
+### Výpisy informací
+"""
 - Ke třídě Estate a Residence přidej výpisy informací do metody __str__(). 
 Např.: Zemědělský pozemek, lokalita Manětín (koeficient 1), 900 metrů čtverečních, 
 daň 765 Kč.
+"""
+
+### Úprava třídy Property
+"""
 - Uprav třídu Property na abstraktní třídu. Tato třída totiž nereprezentuje žádnou 
 konkrétní nemovitost, nemovitost totiž musí být pozemek nebo stavba.
+"""
+
+### Třída TaxReport
+"""
 - Přidej třídu TaxReport, která bude reprezentovat daňové přiznání. Třída bude mít 
 atributy name (jméno osoby, která přiznání podává) a property_list, což je seznam 
-nemovitostí, které jsou v přiznání uvedeny. Dále přidej metodu add_property(), 
+nemovitostí, které jsou v přiznání uvedeny.
+"""
+
+#### Metoda add_property()
+"""
+Dále přidej metodu add_property(), 
 která bude mít jako parametr objekt (nemovitost, která je součástí přiznání) 
-a vloží ji do seznamu property_list. Dále přidej metodu calculate_tax(), 
+a vloží ji do seznamu property_list. 
+"""
+
+#### Metoda calculate_tax()
+"""
+Dále přidej metodu calculate_tax(), 
 která vypočte daň ze všech nemovitostí v seznamu property_list.
+"""
+
+### Enum třídy
+"""
 - Podívej se na to, jak fungují tzv. enum třídy. Můžeš si přečíst například tento 
 text (link: https://www.geeksforgeeks.org/enum-in-python/). Zkus vytvořit třídu pro typy pozemků (zemědělský pozemek, stavební pozemek, 
 les, zahrada) a použít ji ve třídě Estate. Použití této třídy zabrání, aby byl 
 vytvořen pozemek s neexistujícím typem.
 """
-
-### Řešení bonusu
